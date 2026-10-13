@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>حولك</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/screens.css">
+  <link rel="stylesheet" href="css/characters.css">
+  <link rel="stylesheet" href="css/layout.css">
+</head>
+<body>
+<div class="stage" dir="rtl" lang="ar">
+  <button class="demofab" data-ar data-act="demoSheet">وضع العرض للجنة</button>
+  <aside class="side" data-ar>
+    <h1>حولك</h1>
+    <p>نموذج أولي تفاعلي لمنصة سياحية بشخصيات رقمية من ثقافة الزائر. صُمّم للجوال، وهذا الإطار للعرض على الكمبيوتر.</p>
+    <div class="btns" id="demoBtns"></div>
+    <small>كل البيانات والأماكن تجريبية لأغراض العرض، ولا يوجد ربط حقيقي بخدمات الحجز أو الموقع.</small>
+  </aside>
+  <main class="phone" id="phone">
+    <div id="app"></div>
+    <div id="layer"></div>
+  </main>
+</div>
+
+  <script src="js/data/core.js"></script>
+  <script src="js/data/places.js"></script>
+  <script src="js/data/guides.js"></script>
+  <script src="js/state.js"></script>
+  <script src="js/i18n/dictionary.js"></script>
+  <script src="js/i18n/localize.js"></script>
+  <script src="js/characters.js"></script>
+  <script src="js/helpers.js"></script>
+  <script src="js/screens/flow.js"></script>
+  <script src="js/i18n/voice-lines.js"></script>
+  <script src="js/voice.js"></script>
+  <script src="js/screens/home.js"></script>
+  <script src="js/map-data.js"></script>
+  <script src="js/screens/explore.js"></script>
+  <script src="js/screens/place.js"></script>
+  <script src="js/screens/ask.js"></script>
+  <script src="js/screens/plan.js"></script>
+  <script src="js/screens/profile.js"></script>
+  <script src="js/screens/login.js"></script>
+  <script src="js/actions.js"></script>
+  <script src="js/events.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

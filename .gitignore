@@ -1,0 +1,11 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+# Node (إن استُخدم لاحقًا)
+node_modules/
+# أسرار وإعدادات محلية
+.env
+# نظام التشغيل والمحررات
+.DS_Store
+*.log
