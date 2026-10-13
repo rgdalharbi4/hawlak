@@ -1,0 +1,30 @@
+# نشر حولك على Render: New + → Blueprint → اختاري المستودع.
+# المفاتيح (sync: false) تُكتب في لوحة Render ولا تُرفع إلى git.
+services:
+  - type: web
+    name: hawlak
+    runtime: python
+    plan: free
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.13.0
+      - key: LLM_PROVIDER
+        value: groq
+      - key: STT_PROVIDER
+        value: groq
+      - key: TTS_PROVIDER
+        value: elevenlabs
+      - key: LLM_API_KEY
+        sync: false
+      - key: STT_API_KEY
+        sync: false
+      - key: TTS_API_KEY
+        sync: false
+      - key: TTS_VOICE
+        sync: false
+      - key: ADMIN_KEY
+        sync: false

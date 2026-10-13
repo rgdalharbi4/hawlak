@@ -16,22 +16,31 @@ function ask(){
    <div style="padding:0 1.1rem">${cards}</div>
    <div class="microw" style="position:static;background:none;padding-top:1rem"><button class="micbtn" data-act="mic" aria-label="تحدث">${ico('mic')}</button><span class="michint">${L.tap}</span></div>
    <div style="display:flex;flex-direction:column;gap:.55rem;padding:0 1.1rem 1.2rem">
-    ${L.sugg.map((t,i)=>i===2?'':`<button class="vsugg" data-act="suggest" data-v="${i}"><b dir="auto">${t}</b>${ar?'':`<small>${AR_SUGG[i]}</small>`}</button>`).join('')}
+    ${L.sugg.map((t,i)=>(i===2||i===3)?'':`<button class="vsugg" data-act="suggest" data-v="${i}"><b dir="auto">${t}</b>${ar?'':`<small>${AR_SUGG[i]}</small>`}</button>`).join('')}
     <button class="btn ghost sm" data-act="typeToggle" style="align-self:center">${L.typeInstead}</button>
     ${S.typeOpen?`<form class="row" data-form="chat"><label class="search grow" style="padding:.1rem .8rem"><input id="chatq" placeholder="…" aria-label="سؤالك" autocomplete="off"></label><button class="iconbtn" style="background:var(--green);color:var(--on-green);border:0" aria-label="إرسال">${ico('send')}</button></form>`:''}
    </div></div></div>`;
 }
-function sendQ(q,key){
+async function askServer(q){
+  const hist=S.chat.slice(-7,-1).map(m=>m.from==='u'?{role:'user',content:m.text}:{role:'assistant',content:m.local});
+  const r=await fetch('/api/ask',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({message:q,history:hist,profile:{first:S.first,group:S.group,interests:S.interests,budget:S.budget}})});
+  if(!r.ok) throw new Error('ask '+r.status);
+  const j=await r.json();
+  return {from:'g',local:j.id,text:j.ar,cards:j.place_ids||[]};
+}
+async function sendQ(q,key){
   if(!q.trim()||S.typing) return;
   S.chat.push({from:'u',text:q}); S.typing=true; render(true);
-  setTimeout(()=>{ const m=reply(key||intentOf(q),q); S.chat.push(m); S.typing=false; render(true); fx('nod'); say(m.local,G().speak); },700);
+  let m=null;
+  if(S.srv&&S.srv.ask){ try{ m=await askServer(q); }catch(e){ console.warn('الوكيل غير متاح، نستخدم الردود الجاهزة',e); } }
+  if(!m){ await new Promise(r=>setTimeout(r,700)); m=reply(key||intentOf(q),q); }
+  S.chat.push(m); S.typing=false; render(true); fx('nod'); speakReply(m.local);
 }
 function reply(k,q=''){
   const g=G(),L=LOC[g.id]; let list=[];
   const top=(cat,n)=>P.filter(p=>cat.includes(p.cat)&&vis(p)).sort((a,b)=>score(b)-score(a)).slice(0,n);
-  if(k==='homefood'){ const want=/منسف/.test(q)?'ar':S.guide;
-    list=P.filter(p=>p.cat==='food'&&p.cult.includes(want)&&vis(p)).concat(P.filter(p=>p.cat!=='svc'&&p.cat!=='food'&&p.cult.includes(want)&&vis(p))).slice(0,3); }
-  else if(k==='madani') list=ranked(['food'],8).filter(p=>p.cult.includes('local')).slice(0,3);
+  if(k==='madani') list=ranked(['food'],8).filter(p=>p.cult.includes('local')).slice(0,3);
   else if(k==='kids') list=P.filter(p=>p.cat==='food'&&p.fam&&vis(p)).sort((a,b)=>score(b)-score(a)).slice(0,3);
   else if(k==='gifts') list=P.filter(p=>p.cat==='shop'&&p.price<=2&&vis(p)).sort((a,b)=>score(b)-score(a)).slice(0,3);
   else if(k==='coffee') list=ranked(['cafe'],3);

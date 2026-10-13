@@ -1,6 +1,7 @@
 /* ============ Actions ============ */
 function plan(){ if(!S.time)S.time='3h'; S.plan=buildPlan(S.time); }
 const A={
+ enter(){ go('country'); },
  start(){ go('onb',{onb:0}); },
  restart(){ S.guide=null; S.country=null; S.q=''; go('country'); },
  nextOnb(){ if(S.onb<1){S.onb++;render();} else A.pickCity('madinah'); },
@@ -18,7 +19,6 @@ const A={
  prayer(){ S.prev='main'; go('prayer'); },
  picks(){ S.prev='main'; go('picks'); },
  setSar(v){ S.sar=+v; render(true); },
- doLogin(){ const n=(($('#lgN')||{}).value||'').trim()||T('ضيف {0}',BR()); S.user={name:n}; closeSheet(); toast(T('أهلاً {0}، تم تسجيل دخولك (عرض تجريبي)',n)); const f=S.after; S.after=null; if(f) f(); else render(true); },
  beginQuiz(){ S.qi=0;S.ans={};S.done=false; go('quiz'); sayG(LOC[S.guide].q[0]); },
  qback(){ S.qi=Math.max(0,S.qi-1); render(); sayG(LOC[S.guide].q[S.qi]); },
  answer(v){ answer(v); },
@@ -31,16 +31,16 @@ const A={
   const map={eat:'food',sights:'sight',exp:'exp'};
   S.filter=map[v]; S.exView=(v==='near')?'map':'list'; tab('explore'); },
  openPlace(v){ S.prev=S.step==='main'?'main':S.step; S.pid=v; closeSheet(); go('place'); sayPlace(v); },
- save(v){ if(S.saved.has(v)){ S.saved.delete(v); toast('أُزيل من المحفوظات'); render(true); return; } needLogin(()=>{ S.saved.add(v); toast('تم الحفظ في رحلتك'); render(true); }); },
- share(v){ const p=byId(v); const txt=`${p.n} على ${BRAND}`; try{navigator.clipboard.writeText(txt).then(()=>toast('تم نسخ الرابط للمشاركة'),()=>toast(T('انسخ الاسم يدويًا: {0}',p.n)));}catch(e){toast(T('انسخ الاسم يدويًا: {0}',p.n));} },
+ doLogin(){ doLogin(); },
  book(v){ bookSheet(byId(v)); },
- bkTime(v,el){ el.parentNode.querySelectorAll('.chip').forEach(c=>c.classList.remove('on')); el.classList.add('on'); S.bk.t=v; },
- bkN(v,el){ el.parentNode.querySelectorAll('.chip').forEach(c=>c.classList.remove('on')); el.classList.add('on'); S.bk.n=v; },
- confirmBook(v){ closeSheet(); needLogin(()=>toast(T('تم تأكيد الحجز في {0} (عرض تجريبي)',byId(v).n))); },
+ bkN(v,el){ el.parentNode.querySelectorAll('.chip').forEach(c=>c.classList.remove('on')); el.classList.add('on'); S.bk.n=+v; },
+ confirmBook(v){ confirmBook(v); },
+ save(v){ if(S.saved.has(v)){ S.saved.delete(v); toast('أُزيل من المفضلة'); render(true); syncFav(v,false); return; } needLogin(()=>{ S.saved.add(v); toast('تم الحفظ في مفضلتك'); render(true); syncFav(v,true); }); },
+ share(v){ const p=byId(v); const txt=`${p.n} على ${BRAND}`; try{navigator.clipboard.writeText(txt).then(()=>toast('تم نسخ الرابط للمشاركة'),()=>toast(T('انسخ الاسم يدويًا: {0}',p.n)));}catch(e){toast(T('انسخ الاسم يدويًا: {0}',p.n));} },
  route(v){ const p=byId(v); S.mapSel=v; S.route=true; routeSheet(p); },
  showOnMap(v){ S.mvFit=[byId(v),HOTEL]; S.mapSel=v; S.route=true; S.filter='all'; S.exView='map'; S.step='main'; S.tab='explore'; closeSheet(); render(); },
  mapZoom(v){ mapZoom(+v); },
- mapFit(){ const l=filtered(); mvFit(l.concat([HOTEL]),300); mapApply(); },
+ mapFit(){ const l=filtered(); mvFit(l.filter(hasLoc).concat([HOTEL]),300); mapApply(); },
  mapPin(v){ S.mapSel=v; S.route=false; render(true); },
  filter(v){ S.filter=v; S.mapSel=null; render(true); },
  exView(v){ S.exView=v; render(); },
@@ -58,9 +58,7 @@ const A={
  sayLost(){ say(LOC[S.guide].lost,G().speak,null,true); },
  driverFull(){ driverFull(); },
  closeDriver(){ const d=$('#layer .driverfull'); if(d) d.remove(); },
- shareToggle(){ S.share=!S.share; toast(S.share?'تم تفعيل مشاركة موقعك مع أهلك (عرض تجريبي)':'تم إيقاف المشاركة'); render(true); },
  editPlan(){ S.plan=null; render(); },
- savePlan(){ needLogin(()=>{ S.savedPlans++; toast('تم حفظ الخطة في رحلتي'); render(true); }); },
  a11ySheet(){ a11ySheet(); },
  a11y(v){ S.a11y[v]=!S.a11y[v]; closeSheet(); a11ySheet(); render(true); },
  notifs(){ notifsSheet(); },
@@ -69,25 +67,13 @@ const A={
  changeGuide(){ sheet(`<h3 style="margin-bottom:.6rem">اختر مرشدك</h3><div style="display:flex;flex-direction:column;gap:.5rem">${Object.values(GUIDES).map(g=>`<button class="country" data-act="setGuide" data-v="${g.id}">${avatar(g.id,46)}<span class="grow"><b>${g.name}</b><small class="muted" style="display:block">${g.country} · ${g.lang}</small></span>${g.id===S.guide?ico('check'):''}</button>`).join('')}</div>`); },
  setGuide(v){ S.guide=v; S.lang=null; const c=COUNTRIES.find(x=>x[2]===v); if(c) S.country=c[0]; S.chat=[]; S.plan=null; S.mapSel=null; if(S.tab==='ask') startChat(); closeSheet(); render(true); toast('تم تغيير المرشد'); fx('wave'); sayG(G().hello); },
  menu(v){
-  if(v==='currency'){ S.prev='main'; go('currency'); }
-  else if(v==='gates'){ S.prev='main'; go('gates'); }
-  else if(v==='partner'){ S.prev='main'; go('partner'); }
-  else if(v==='social'){ S.prev='main'; go('social'); }
-  else if(v==='a11y') a11ySheet();
-  else if(v==='notifs') notifsSheet();
+  if(v==='a11y') a11ySheet();
   else if(v==='fav'){ const l=[...S.saved].map(byId); sheet(`<h3 style="margin-bottom:.5rem">المفضلة</h3>${l.length?l.map(p=>`<button class="card cultcard" style="margin-bottom:.5rem" data-act="openPlace" data-v="${p.id}">${artBlock(p)}<span class="grow"><b>${p.n}</b>${stat(p)}</span></button>`).join(''):'<p class="muted">لم تحفظ شيئًا بعد. اضغط على القلب في أي مكان.</p>'}`); }
-  else if(v==='trip'){ sheet(`<h3 style="margin-bottom:.4rem">رحلتي</h3><p>${T('المدينة المنورة · {0}',T((TIME[S.time]||['٣ ساعات'])[0]))}</p><p class="muted small">${T('{0} أماكن محفوظة، {1} خطة محفوظة.',AR(S.saved.size),AR(S.savedPlans))}</p>`); }
-  else if(v==='lang'){ langSheet(); }
-  else if(v==='cur'){ sheet(`<h3 style="margin-bottom:.4rem">العملة</h3><div class="chips">${['ريال سعودي','دولار','يورو','ليرة تركية','روبية'].map((l,i)=>`<button class="chip ${i===0?'on':''}" data-act="toast" data-v="تحويل العملات قادم في النسخة الكاملة">${l}</button>`).join('')}</div>`); }
-  else if(v==='about'){ sheet(`<h3>${T('عن {0}',BR())}</h3><p style="margin:.5rem 0">شخصية من ثقافتك، تكلمك بلهجتك، تعرّفك على المدينة قبل وصولك، وتدلك على ما حولك عند وصولك.</p><p class="muted small">نموذج أولي لأغراض الهاكاثون. المحتوى الديني يُراجع من مصادر معتمدة قبل نشره.</p>`); }
+  else if(v==='about'){ sheet(`<h3>${T('عن {0}',BR())}</h3><p style="margin:.5rem 0">رفيقك الرقمي من ثقافتك، يتكلم بلغتك، ويدلك على ما حولك في منطقة قباء.</p><p class="muted small">المحتوى الديني يُراجع من مصادر معتمدة قبل نشره.</p><p class="muted small" style="margin-top:.6rem">${S.srv&&S.srv.tts?T('صوت المرشد: مفعّل'):T('صوت المتصفح (بدون خادم)')}</p>`); }
  },
- sendPartner(){ $('#pForm').innerHTML=`<div class="card" style="padding:1.2rem;text-align:center"><div class="badge ok" style="font-size:1rem">${ico('check')}تم استلام طلبك</div><p class="muted" style="margin-top:.6rem">سنتواصل معك قريبًا. هذا عرض تجريبي ولم يُرسل أي شيء.</p></div>`; },
- pcat(v,el){ el.parentNode.querySelectorAll('.chip').forEach(c=>c.classList.remove('on')); el.classList.add('on'); },
  socialGuide(v){ reelStop(); S.guide=v; S.lang=null; S.chat=[]; render(true); },
  socialCta(){ S.country=S.country||G().country; go('guide'); },
  toast(v){ toast(v); },
- demoSheet(){ demoSheet(); },
- demo(v){ runDemo(v); },
  closeSheet(){ closeSheet(); },
  send(v){ sendQ(v); },
  suggest(v){ const L=LOC[S.guide]; sendQ(L.sugg[+v],SKEYS[+v]); },

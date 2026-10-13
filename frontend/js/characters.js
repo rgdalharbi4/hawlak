@@ -1,5 +1,6 @@
 /* ============ Avatars ============ */
-const ODIN_IMG='assets/characters/odin_photo.jpg',ODIN_BODY='assets/characters/odin_body.jpg',ODIN_REEL='assets/characters/odin_reel.jpg';
+/* أودين صورة ثابتة (بدون حركة إطارات). الشخصيات الأخرى لها حركة sprite عند تفعيلها. */
+const STILL={id:'assets/characters/odin_full.png'};
 const BGC={eg:'#CFDDEB',tr:'#BFE0DC',fr:'#C9D6EC',uk:'#D5DEBC',ar:'#CFE0D6'};
 const FIG={
  tr:{skin:'#E6B691',hair:'#3A2418',top:'#2E7D7A',inner:'#F4EBDD',pants:'#3B3F55',shoe:'#EDE6D6',kind:'long'},
@@ -41,12 +42,13 @@ function figSvg(id,mode){
   s+=`<path class="smile" d="M92 74Q100 81 108 74" stroke="#8A3B2B" stroke-width="2.4" fill="none" stroke-linecap="round"/><ellipse class="mouth" cx="100" cy="76" rx="5.5" ry="4" fill="#7A2B2B"/>`;
   return s+'</g></svg>';
 }
-const SPR={"id": {"w": 150, "h": 368, "cols": 8, "rows": 6, "n": 43, "fps": 18, "idle": 42}, "tr": {"w": 192, "h": 368, "cols": 8, "rows": 6, "n": 48, "fps": 16, "idle": 47}, "eg": {"w": 164, "h": 368, "cols": 8, "rows": 6, "n": 48, "fps": 12, "idle": 18}};
+const SPR={"tr": {"w": 192, "h": 368, "cols": 8, "rows": 6, "n": 48, "fps": 16, "idle": 47}, "eg": {"w": 164, "h": 368, "cols": 8, "rows": 6, "n": 48, "fps": 12, "idle": 18}};
 const HEAD={id:'assets/characters/odin_head.jpg',tr:'assets/characters/umut_head.jpg',eg:'assets/characters/nile_head.jpg'};
 const sprPos=(id,f)=>{ const c=SPR[id]; const col=f%c.cols,row=Math.floor(f/c.cols); return `${c.cols>1?(col*100/(c.cols-1)).toFixed(3):0}% ${c.rows>1?(row*100/(c.rows-1)).toFixed(3):0}%`; };
 function sprSet(el,f){ el.style.backgroundPosition=sprPos(el.dataset.sp,f); }
 function sprWave(){ document.querySelectorAll('.fig.spr').forEach(el=>{ const c=SPR[el.dataset.sp]; if(!c) return; if(el._t) clearInterval(el._t); let f=0; sprSet(el,0); el._t=setInterval(()=>{ f++; if(f>=c.n){ clearInterval(el._t); el._t=null; sprSet(el,c.idle); return; } sprSet(el,f); },1000/c.fps); }); }
 function figure(id,h,cls=''){
+  if(STILL[id]) return `<span class="fig still ${cls}" role="img" aria-label="${GUIDES[id].name}" style="height:${h}px"><img src="${STILL[id]}" alt=""></span>`;
   const c=SPR[id]; if(!c) return `<span class="fig ${cls}" style="height:${h}px">${figSvg(id,'full')}</span>`;
   const w=Math.round(h*c.w/c.h);
   return `<span class="fig spr spr-${id} ${cls}" data-sp="${id}" role="img" aria-label="${GUIDES[id].name}" style="height:${h}px;width:${w}px;background-size:${c.cols*100}% ${c.rows*100}%;background-position:${sprPos(id,c.idle)}"></span>`;

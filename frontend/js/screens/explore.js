@@ -1,7 +1,11 @@
 /* Explore */
-function filterList(){ return [['all','الكل'],['sight','أماكن أزورها'],['exp','تجارب'],['food','أكل وقهوة']]; }
+/* الأقسام الظاهرة: قسم لكل اهتمام اختاره الزائر، وباسمه نفسه في سؤال «وش تحب؟» */
+const IGROUPS=[['sight','hist'],['exp','local'],['food','food'],['cafe','coffee']];   // [نوع المكان، الاهتمام]
+const interestLabel=k=>T(IMAP[k]);
+function groupsWanted(){ const a=S.interests||[]; return IGROUPS.filter(g=>!a.length||a.includes(g[1])).map(g=>[g[0],interestLabel(g[1]),[g[0]],g[1]]); }
+function filterList(){ const g=groupsWanted(); return g.length<=1?[]:[['all',T('الكل')],...g.map(x=>[x[0],x[1]])]; }
 const KEEP=['sight','exp','food','cafe'];
-function filtered(){ return P.filter(p=>vis(p)&&KEEP.includes(p.cat)&&(S.filter==='all'||p.cat===S.filter||(S.filter==='food'&&p.cat==='cafe'))); }
+function filtered(){ return P.filter(p=>vis(p)&&KEEP.includes(p.cat)&&(S.filter==='all'||p.cat===S.filter)); }
 function explore(){
   const v=S.exView;
   return `<div style="display:flex;flex-direction:column;flex:1;min-height:0">
@@ -26,7 +30,7 @@ function mapView(){
   <svg class="map" id="mapsvg" role="img" aria-label="${T('خريطة المدينة المنورة')}"><rect width="100%" height="100%" fill="var(--sand)"/>${base}<g id="mpins"></g></svg>
   <div class="mapctl"><button class="btn sm" data-act="mapZoom" data-v="1" aria-label="${T('تكبير')}">＋</button><button class="btn sm" data-act="mapZoom" data-v="-1" aria-label="${T('تصغير')}">－</button><button class="btn sm" data-act="mapFit" aria-label="${T('عرض الكل')}">${ico('pin')}</button></div>
   <div class="mapcredit">© OpenStreetMap</div>
-  ${sel?`<div class="card mapcard">${artBlock(sel)}<div class="grow"><b>${sel.n}</b>${stat(sel)}</div><div style="display:flex;flex-direction:column;gap:.3rem"><button class="btn primary sm" data-act="route" data-v="${sel.id}">خذني له</button><button class="btn sm" data-act="openPlace" data-v="${sel.id}">التفاصيل</button></div></div>`:`<div class="small muted mapnote">${T('اسحب الخريطة وكبّرها. النقطة الزرقاء فندقك (مثال)، والأماكن مصدرها بيانات الخريطة المفتوحة.')}</div>`}
+  ${sel?`<div class="card mapcard">${artBlock(sel)}<div class="grow"><b>${sel.n}</b>${stat(sel)}</div><div style="display:flex;flex-direction:column;gap:.3rem"><button class="btn primary sm" data-act="route" data-v="${sel.id}">خذني له</button><button class="btn sm" data-act="openPlace" data-v="${sel.id}">التفاصيل</button></div></div>`:`<div class="small muted mapnote">${T('اسحب الخريطة وكبّرها. النقطة الزرقاء فندقك.')}</div>`}
   </div>`;
 }
 function mapApply(){
@@ -35,8 +39,8 @@ function mapApply(){
   const q=(x,y)=>({x:tx+k*x,y:ty-k*y});
   $('#mbase').setAttribute('transform',`translate(${tx.toFixed(1)} ${ty.toFixed(1)}) scale(${k} ${-k})`);
   $('#mbase').dataset.far=k<.06?'1':'0';
-  const list=filtered(),sel=S.mapSel?byId(S.mapSel):null,hp=q(HOTEL.x,HOTEL.y);
-  let route=''; if(S.route&&sel){ const b=q(sel.x,sel.y); route=`<path d="M${hp.x.toFixed(1)} ${hp.y.toFixed(1)} L${b.x.toFixed(1)} ${b.y.toFixed(1)}" fill="none" stroke="var(--gold)" stroke-width="4" stroke-dasharray="2 8" stroke-linecap="round"/>`; }
+  const list=filtered().filter(hasLoc),sel=S.mapSel?byId(S.mapSel):null,hp=q(HOTEL.x,HOTEL.y);
+  let route=''; if(S.route&&sel&&hasLoc(sel)){ const b=q(sel.x,sel.y); route=`<path d="M${hp.x.toFixed(1)} ${hp.y.toFixed(1)} L${b.x.toFixed(1)} ${b.y.toFixed(1)}" fill="none" stroke="var(--gold)" stroke-width="4" stroke-dasharray="2 8" stroke-linecap="round"/>`; }
   const pins=list.map(p=>{const m=q(p.x,p.y);const col=`var(${CAT[p.cat].col})`;const on=sel&&sel.id===p.id;return `<g class="pin" tabindex="0" role="button" aria-label="${p.n}" data-act="mapPin" data-v="${p.id}" transform="translate(${m.x.toFixed(1)},${m.y.toFixed(1)})"><circle r="${on?14:9}" fill="${col}" stroke="var(--surface)" stroke-width="2.5"/><g transform="translate(${on?-7:-5},${on?-7:-5}) scale(${on?.58:.42})" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">${ICON[p.cat==='svc'?SUB[p.sub][1]:CAT[p.cat].ic]}</g></g>`}).join('');
   const L=niceLen(90/k),sx=14,sy=H-16;
   const bar=`<g class="mscale"><path d="M${sx} ${sy-5}V${sy}H${sx+L*k}V${sy-5}" fill="none" stroke="var(--ink)" stroke-width="1.6"/><text x="${sx+2}" y="${sy-8}" font-size="10" fill="var(--ink)">${L<1000?T('{0} م',AR(L)):T('{0} كم',AR(L/1000))}</text></g>`;
@@ -47,7 +51,7 @@ function mapInit(){
   const r=svg.getBoundingClientRect(); const z=parseFloat(getComputedStyle(document.documentElement).zoom)||1;
   MV.W=Math.max(200,Math.round(svg.clientWidth)||380); MV.H=Math.max(200,Math.round(svg.clientHeight)||460);
   svg.setAttribute('viewBox',`0 0 ${MV.W} ${MV.H}`);
-  if(S.mvFit){ mvFit(S.mvFit,350); S.mvFit=null; } else if(!S.mvInit){ mvFit(P.concat([HOTEL]),300); }
+  if(S.mvFit){ mvFit(S.mvFit,350); S.mvFit=null; } else if(!S.mvInit){ mvFit(P.filter(hasLoc).concat([HOTEL]),300); }
   S.mvInit=true; mapApply(); localize($('#mapsvg'));
   let st=null,dragged=false;
   const sc=()=>svg.getBoundingClientRect().width/MV.W||1;
@@ -65,7 +69,7 @@ function listView(){
   const svcs=Object.entries(SUB);
   return `<div class="screen" style="animation:none"><div class="pad" style="padding-top:.2rem">
    <div class="chips" style="margin-bottom:.8rem">${filterList().map(f=>`<button class="chip ${S.filter===f[0]?'on':''}" data-act="filter" data-v="${f[0]}">${f[1]}</button>`).join('')}</div>
-   <div class="sec-title"><h3>${S.filter==='all'?'كل الأماكن':({sight:'أماكن أزورها',exp:'تجارب',food:'أكل وقهوة'})[S.filter]}</h3><span>${T('{0} نتيجة · بيانات تجريبية',AR(filtered().length))}</span></div>
-   <div style="display:flex;flex-direction:column;gap:.7rem">${filtered().sort((a,b)=>a.dist-b.dist).map(p=>`<button class="card cultcard" data-act="openPlace" data-v="${p.id}">${artBlock(p)}<span class="grow"><b>${p.n}</b>${stat(p)}</span></button>`).join('')}</div></div></div>`;
+   <div class="sec-title"><h3>${S.filter==='all'?(groupsWanted().length===1?groupsWanted()[0][1]:T('كل الأماكن')):interestLabel(IGROUPS.find(g=>g[0]===S.filter)[1])}</h3><span>${T('{0} نتيجة',AR(filtered().length))}</span></div>
+   <div style="display:flex;flex-direction:column;gap:.7rem">${filtered().sort((a,b)=>D(a)-D(b)).map(p=>`<button class="card cultcard" data-act="openPlace" data-v="${p.id}">${artBlock(p)}<span class="grow"><b>${p.n}</b>${stat(p)}</span></button>`).join('')}</div></div></div>`;
 }
 

@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>لوحة الفريق · حولك</title>
+<link rel="icon" type="image/png" href="assets/brand/logo.png">
+<style>
+:root{--bg:#FBF5EC;--ink:#10262B;--muted:#5C6B6D;--green:#0E5A63;--line:#E6DCCB;--surface:#fff;--gold:#B94A24}
+*{box-sizing:border-box}
+body{margin:0;font-family:"IBM Plex Sans Arabic","Geeza Pro",system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.7}
+header{display:flex;align-items:center;gap:.8rem;padding:.8rem 1.2rem;background:var(--surface);border-bottom:1px solid var(--line)}
+header img{width:40px;height:40px;border-radius:11px} header h1{font-size:1.25rem;margin:0}
+main{max-width:1100px;margin:1.2rem auto;padding:0 1rem}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:1rem 1.1rem;box-shadow:0 6px 18px rgba(14,60,66,.08)}
+input,select{font:inherit;padding:.6rem .8rem;border:1px solid var(--line);border-radius:12px;background:#fff}
+button{font:inherit;font-weight:700;padding:.6rem 1.1rem;border-radius:12px;border:0;background:var(--green);color:#fff;cursor:pointer}
+button.alt{background:#fff;color:var(--ink);border:1px solid var(--line)}
+.row{display:flex;gap:.6rem;align-items:center;flex-wrap:wrap}
+.stats{display:flex;gap:.6rem;flex-wrap:wrap;margin:1rem 0}
+.stat{background:#fff;border:1px solid var(--line);border-radius:14px;padding:.4rem .9rem}
+.stat b{color:var(--green)}
+table{width:100%;border-collapse:collapse;margin-top:.6rem;font-size:.95rem}
+th,td{padding:.55rem .6rem;border-bottom:1px solid var(--line);text-align:start;vertical-align:middle}
+th{color:var(--muted);font-weight:600;font-size:.85rem}
+td a{color:var(--green);font-weight:600;text-decoration:none}
+#msg{color:var(--gold);min-height:1.5em;font-weight:600}
+.wrap{overflow-x:auto}
+</style></head>
+<body>
+<header><img src="assets/brand/logo.png" alt=""><h1>لوحة الفريق: طلبات الحجز</h1></header>
+<main>
+  <div class="card" id="login">
+    <div class="row"><input id="key" type="password" placeholder="كلمة سر الفريق" autocomplete="current-password"><button id="go">دخول</button></div>
+  </div>
+  <p id="msg"></p>
+  <div id="app" hidden>
+    <div class="row"><button class="alt" id="refresh">تحديث</button><button class="alt" id="csv">تنزيل CSV</button><button class="alt" id="out">خروج</button></div>
+    <div class="stats" id="stats"></div>
+    <div class="card wrap"><table>
+      <thead><tr><th>وقت الطلب</th><th>الاسم</th><th>الجوال</th><th>المكان</th><th>الوقت المطلوب</th><th>العدد</th><th>الحالة</th></tr></thead>
+      <tbody id="rows"></tbody>
+    </table></div>
+  </div>
+</main>
+<script>
+const ST={pending:'جديد',contacted:'تم التواصل',confirmed:'مؤكد',rejected:'مرفوض'};
+const $=id=>document.getElementById(id);
+let key='',data=[];
+try{key=sessionStorage.getItem('adminKey')||''}catch(e){}
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+async function call(path,opt={}){
+  const r=await fetch(path,{...opt,headers:{'Content-Type':'application/json','X-Admin-Key':key}});
+  const j=await r.json().catch(()=>({}));
+  if(!r.ok) throw new Error(j.detail||'تعذّر الاتصال');
+  return j;
+}
+function draw(){
+  const n=s=>data.filter(b=>b.status===s).length;
+  $('stats').innerHTML=`<span class="stat">الكل <b>${data.length}</b></span>`+Object.keys(ST).map(s=>`<span class="stat">${ST[s]} <b>${n(s)}</b></span>`).join('');
+  $('rows').innerHTML=data.map(b=>`<tr><td>${new Date(b.created_at*1000).toLocaleString('ar-SA')}</td><td>${esc(b.name)}</td><td dir="ltr"><a href="tel:${esc(b.phone)}">${esc(b.phone)}</a></td><td>${esc(b.place)}</td><td>${esc(b.at_time)}</td><td>${b.people}</td><td><select data-id="${b.id}">${Object.keys(ST).map(s=>`<option value="${s}"${s===b.status?' selected':''}>${ST[s]}</option>`).join('')}</select></td></tr>`).join('')||'<tr><td colspan="7">لا توجد طلبات بعد</td></tr>';
+}
+async function load(){
+  $('msg').textContent='';
+  try{data=await call('/api/admin/bookings');$('login').hidden=true;$('app').hidden=false;draw();try{sessionStorage.setItem('adminKey',key)}catch(e){}}
+  catch(e){$('msg').textContent=e.message;$('login').hidden=false;$('app').hidden=true}
+}
+$('go').onclick=()=>{key=$('key').value;load()};
+$('key').onkeydown=e=>{if(e.key==='Enter')$('go').click()};
+$('refresh').onclick=load;
+$('out').onclick=()=>{key='';try{sessionStorage.removeItem('adminKey')}catch(e){}$('app').hidden=true;$('login').hidden=false;$('key').value=''};
+$('rows').onchange=async e=>{
+  const s=e.target.closest('select');if(!s)return;
+  try{await call('/api/admin/bookings/'+s.dataset.id,{method:'PUT',body:JSON.stringify({status:s.value})});data.find(b=>b.id==s.dataset.id).status=s.value;draw()}
+  catch(err){$('msg').textContent=err.message;load()}
+};
+$('csv').onclick=()=>{
+  const q=v=>'"'+String(v).replace(/"/g,'""')+'"';
+  const lines=[['الاسم','الجوال','المكان','الوقت المطلوب','العدد','الحالة'].map(q).join(',')].concat(data.map(b=>[b.name,b.phone,b.place,b.at_time,b.people,ST[b.status]].map(q).join(',')));
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['﻿'+lines.join('\n')],{type:'text/csv;charset=utf-8'}));a.download='bookings.csv';a.click();
+};
+if(key)load();
+</script>
+</body></html>

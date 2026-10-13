@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>فحص الصوت</title>
+<style>
+body{font-family:system-ui,"Geeza Pro",sans-serif;max-width:640px;margin:2rem auto;padding:0 1rem;line-height:1.8;background:#FBF5EC;color:#10262B}
+button{font:inherit;font-weight:700;padding:.9rem 1.6rem;border-radius:14px;border:0;background:#0E5A63;color:#fff;cursor:pointer}
+li{margin:.4rem 0;list-style:none} .ok{color:#177a3c} .bad{color:#b3261e;font-weight:700}
+#log{padding:0;margin-top:1.2rem}
+</style></head>
+<body>
+<h1>فحص صوت المرشد</h1>
+<p>اضغطي الزر مرة واحدة، وانتظري ثوانٍ، ثم أرسلي لي لقطة للنتيجة.</p>
+<button id="go">ابدأ الفحص</button>
+<ul id="log"></ul>
+<script>
+const log=(t,ok)=>{ const li=document.createElement('li'); li.className=ok===false?'bad':(ok?'ok':''); li.textContent=(ok===false?'✖ ':ok?'✔ ':'• ')+t; document.getElementById('log').appendChild(li); };
+document.getElementById('go').onclick=async()=>{
+  document.getElementById('log').innerHTML='';
+  log('المتصفح: '+navigator.userAgent.replace(/\(.*?\)/,'').slice(0,80));
+  // 1) الخادم
+  let st; try{ st=await (await fetch('/api/config/status')).json(); log('الخادم يرد. المزودون: '+JSON.stringify(st.providers),true); }catch(e){ log('تعذّر الاتصال بالخادم: '+e,false); return; }
+  if(st.providers.tts==='fake'){ log('مزود الصوت غير مفعّل في .env',false); return; }
+  // 2) توليد الصوت
+  let blob; try{ const r=await fetch('/api/tts',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:'Halo! Saya Odin, teman seperjalananmu di Madinah.',language:'id'})}); if(!r.ok){ log('الخادم رفض توليد الصوت. الرمز: '+r.status,false); return; } blob=await r.blob(); log('وصل ملف الصوت: '+Math.round(blob.size/1024)+' KB ('+blob.type+')',true); }catch(e){ log('فشل توليد الصوت: '+e,false); return; }
+  // 3) سياق الصوت
+  let ctx; try{ ctx=new (window.AudioContext||window.webkitAudioContext)(); await ctx.resume(); log('حالة الصوت في المتصفح: '+ctx.state,ctx.state==='running'); }catch(e){ log('سياق الصوت: '+e,false); }
+  // 4) فك الترميز
+  let buf; try{ buf=await ctx.decodeAudioData(await blob.arrayBuffer()); log('فُكّ ترميز الصوت: '+buf.duration.toFixed(1)+' ثانية',true); }catch(e){ log('فشل فك الترميز: '+e,false); }
+  // 5) التشغيل عبر WebAudio
+  if(buf){ try{ const s=ctx.createBufferSource(); s.buffer=buf; s.connect(ctx.destination); s.start(); log('بدأ التشغيل (WebAudio). هل سمعتِ صوتًا رجاليًا؟',true); await new Promise(r=>setTimeout(r,(buf.duration+0.5)*1000)); }catch(e){ log('فشل التشغيل: '+e,false); } }
+  // 6) التشغيل عبر عنصر الصوت
+  try{ const a=new Audio(URL.createObjectURL(blob)); await a.play(); log('بدأ التشغيل (عنصر الصوت)',true); }catch(e){ log('عنصر الصوت رُفض: '+e.name+' (هذا متوقع في Safari بدون ضغطة مباشرة)',null); }
+  // 7) الصوت القديم للمقارنة
+  log('انتهى الفحص. إن لم تسمعي شيئًا في الخطوة 5 فتحققي من مستوى الصوت وأن التبويب غير مكتوم.');
+};
+</script>
+</body></html>

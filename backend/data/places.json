@@ -3,214 +3,164 @@
   "id": "s1",
   "cat": "sight",
   "name": "مسجد قباء",
-  "lat": 24.4396,
-  "lon": 39.6173,
+  "lat": 24.4393911,
+  "lon": 39.6173007,
   "tags": [
-   "hist",
-   "family"
+   "hist"
   ],
-  "t": 45,
+  "eco": true,
+  "d": "أول مسجد بُني في الإسلام، ويقع في قلب منطقة قباء.",
   "hrs": "على مدار الساعة",
-  "np": 0,
-  "d": "أول مسجد بُني في الإسلام، ويقع في قلب منطقة قباء."
+  "name_latin": "Masjid Quba",
+  "note_en": "The first mosque built in Islam, in the heart of the Quba area.",
+  "cid": "7550015683493755470",
+  "dist_to_quba_mosque_m": 0
  },
  {
   "id": "s2",
   "cat": "sight",
-  "name": "بئر أريس",
-  "lat": 24.4389,
-  "lon": 39.6165,
+  "name": "بئر الخاتم",
+  "lat": 24.4389192,
+  "lon": 39.6166348,
   "tags": [
    "hist"
   ],
-  "t": 15,
-  "np": 0,
-  "d": "موقع تاريخي قريب من مسجد قباء."
+  "eco": true,
+  "d": "موقع تاريخي في منطقة قباء.",
+  "hrs": "",
+  "name_latin": "Sumur Khatam (Bir Aris)",
+  "note_en": "A historic site in the Quba area.",
+  "cid": "10093878104872697150",
+  "dist_to_quba_mosque_m": 90
  },
  {
   "id": "e1",
   "cat": "exp",
-  "name": "مقصد قباء",
-  "lat": 24.4372,
-  "lon": 39.6164,
+  "name": "تجربة بستان المستظل وبئر عذق",
+  "lat": 24.4385602,
+  "lon": 39.615801,
   "tags": [
-   "local",
-   "family"
+   "local"
   ],
-  "t": 90,
-  "d": "وجهة بجوار مسجد قباء تحتضن فعاليات ويزورها كثيرون."
+  "eco": true,
+  "d": "تجربة في منطقة قباء.",
+  "hrs": "",
+  "name_latin": "Pengalaman Kebun Al-Mustazill dan Sumur 'Adzq",
+  "note_en": "An experience in the Quba area.",
+  "cid": "7783095712998790854",
+  "dist_to_quba_mosque_m": 180
  },
  {
   "id": "e2",
   "cat": "exp",
-  "name": "واحة ميلاف",
-  "lat": 24.4356,
-  "lon": 39.6187,
-  "tags": [
-   "local",
-   "family"
-  ],
-  "t": 60,
-  "d": "وجهة سياحية في منطقة قباء."
- },
- {
-  "id": "e3",
-  "cat": "exp",
-  "name": "مزرعة المربد",
-  "lat": 24.4424,
-  "lon": 39.6284,
+  "name": "ورد المدينة",
+  "lat": 24.4735947,
+  "lon": 39.6111645,
   "tags": [
    "local"
   ],
-  "t": 60,
-  "d": "مزرعة ومكان للطعام في منطقة قباء، حسب بيانات الخريطة."
- },
- {
-  "id": "f1",
-  "cat": "food",
-  "name": "مطعم تركيا",
-  "lat": 24.4454,
-  "lon": 39.6061,
-  "tags": [],
-  "d": "مطعم في منطقة قباء."
- },
- {
-  "id": "f2",
-  "cat": "food",
-  "name": "اسطنبول شيش كباب",
-  "lat": 24.44,
-  "lon": 39.6146,
-  "tags": [],
-  "d": "مطعم قريب من مسجد قباء."
- },
- {
-  "id": "f3",
-  "cat": "food",
-  "name": "الطبق الجاوي",
-  "lat": 24.4494,
-  "lon": 39.6158,
-  "tags": [],
-  "cult": [
-   "id"
-  ],
-  "d": "مطعم في منطقة قباء، واسمه يشير إلى المطبخ الجاوي."
- },
- {
-  "id": "f4",
-  "cat": "food",
-  "name": "مطعم الباب العالي",
-  "lat": 24.449,
-  "lon": 39.6216,
-  "tags": [],
-  "d": "مطعم في منطقة قباء."
- },
- {
-  "id": "f5",
-  "cat": "food",
-  "name": "مطعم الشلال الدمشقي",
-  "lat": 24.4498,
-  "lon": 39.6211,
-  "tags": [],
-  "d": "مطعم في منطقة قباء."
- },
- {
-  "id": "f6",
-  "cat": "food",
-  "name": "مذاقك الشهي",
-  "lat": 24.4493,
-  "lon": 39.6211,
-  "tags": [],
-  "d": "مطعم في منطقة قباء."
- },
- {
-  "id": "f7",
-  "cat": "food",
-  "name": "مطعم هناء الراقي",
-  "lat": 24.4457,
-  "lon": 39.6064,
-  "tags": [],
-  "d": "مطعم في منطقة قباء."
- },
- {
-  "id": "f8",
-  "cat": "food",
-  "name": "مطبق حي البحر",
-  "lat": 24.4495,
-  "lon": 39.6187,
-  "tags": [],
-  "d": "مطعم في منطقة قباء."
- },
- {
-  "id": "f9",
-  "cat": "food",
-  "name": "كودو",
-  "lat": 24.4463,
-  "lon": 39.62,
-  "tags": [],
-  "d": "مطعم وجبات سريعة في منطقة قباء."
- },
- {
-  "id": "f10",
-  "cat": "food",
-  "name": "مطعم طيبة للمأكولات الشامية",
-  "lat": 24.4528,
-  "lon": 39.6229,
-  "tags": [],
-  "d": "مطعم في منطقة قباء."
+  "eco": false,
+  "d": "تجربة في المدينة المنورة.",
+  "hrs": "",
+  "name_latin": "Wardul Madinah",
+  "note_en": "An experience in Madinah.",
+  "cid": "4031152627242293328",
+  "dist_to_quba_mosque_m": 3850
  },
  {
   "id": "c1",
   "cat": "cafe",
-  "name": "أريس كافيه",
-  "lat": 24.4497,
-  "lon": 39.6215,
+  "name": "أشجار كافيه",
+  "lat": 24.4388051,
+  "lon": 39.6160623,
   "tags": [
    "coffee"
   ],
-  "d": "مقهى في منطقة قباء."
+  "eco": true,
+  "d": "مقهى في منطقة قباء.",
+  "hrs": "",
+  "name_latin": "Ashjar Cafe",
+  "note_en": "A coffee place in the Quba area.",
+  "cid": "18085889367733106961",
+  "dist_to_quba_mosque_m": 140
  },
  {
   "id": "c2",
   "cat": "cafe",
-  "name": "قهوة موكا",
-  "lat": 24.4501,
-  "lon": 39.6224,
+  "name": "كوفيماتكس",
+  "lat": 24.4372935,
+  "lon": 39.6164538,
   "tags": [
    "coffee"
   ],
-  "d": "مقهى في منطقة قباء."
+  "eco": false,
+  "d": "مقهى في منطقة قباء.",
+  "hrs": "",
+  "name_latin": "Coffeematix",
+  "note_en": "A coffee place in the Quba area.",
+  "cid": "17733243291217134951",
+  "dist_to_quba_mosque_m": 250
  },
  {
   "id": "c3",
   "cat": "cafe",
-  "name": "غلا القهوة",
-  "lat": 24.4495,
-  "lon": 39.6161,
+  "name": "عجوتك",
+  "lat": 24.4389262,
+  "lon": 39.6155562,
   "tags": [
    "coffee"
   ],
-  "d": "مقهى في منطقة قباء."
+  "eco": false,
+  "d": "مقهى في منطقة قباء.",
+  "hrs": "",
+  "name_latin": "Ajwatak",
+  "note_en": "A coffee place in the Quba area.",
+  "cid": "9663407688430174627",
+  "dist_to_quba_mosque_m": 180
  },
  {
-  "id": "c4",
-  "cat": "cafe",
-  "name": "الأسود",
-  "lat": 24.4474,
-  "lon": 39.6169,
-  "tags": [
-   "coffee"
-  ],
-  "d": "مقهى في منطقة قباء."
+  "id": "f1",
+  "cat": "food",
+  "name": "سقى",
+  "lat": 24.438693,
+  "lon": 39.6158245,
+  "tags": [],
+  "eco": false,
+  "d": "مطعم في منطقة قباء.",
+  "hrs": "",
+  "name_latin": "SOQA",
+  "note_en": "A restaurant in the Quba area.",
+  "cid": "14488963176241528182",
+  "dist_to_quba_mosque_m": 170
  },
  {
-  "id": "c5",
-  "cat": "cafe",
-  "name": "المذاق المغربي",
-  "lat": 24.4412,
-  "lon": 39.6201,
-  "tags": [
-   "coffee"
-  ],
-  "d": "مقهى قريب من مسجد قباء."
+  "id": "f2",
+  "cat": "food",
+  "name": "عطرة",
+  "lat": 24.4589441,
+  "lon": 39.6089792,
+  "tags": [],
+  "eco": false,
+  "d": "مطعم في المدينة المنورة.",
+  "hrs": "",
+  "name_latin": "Etruh",
+  "note_en": "A restaurant in Madinah.",
+  "cid": "16241477494620730908",
+  "dist_to_quba_mosque_m": 2330
+ },
+ {
+  "id": "f3",
+  "cat": "food",
+  "name": "أولد قولد",
+  "lat": 24.4371255,
+  "lon": 39.6161878,
+  "tags": [],
+  "eco": true,
+  "d": "مطعم في منطقة قباء.",
+  "hrs": "",
+  "name_latin": "Old Gold Burger",
+  "note_en": "A restaurant in the Quba area.",
+  "cid": "8188931649866699541",
+  "dist_to_quba_mosque_m": 280
  }
 ]

@@ -25,15 +25,11 @@ function langSheet(){
   const cur=S.lang||'auto'; const opts=[['auto',T('حسب مرشدي')],['ar','العربية'],['id','Bahasa Indonesia'],['tr','Türkçe']];
   sheet(`<h3 style="margin-bottom:.4rem">اللغة</h3><p class="muted small" style="margin-bottom:.6rem">اختر لغة الواجهة. المرشد يبقى يتحدث لغته.</p><div class="chips">${opts.map(o=>`<button class="chip ${cur===o[0]?'on':''}" data-act="setLang" data-v="${o[0]}">${o[1]}</button>`).join('')}</div>`);
 }
-function demoSheet(){
-  sheet(`<div data-ar><h3>وضع العرض للجنة</h3><p class="muted small" style="margin-bottom:.8rem">اختر مسارًا جاهزًا لتبدأ من الصفحة الرئيسية مباشرة.</p>
-   <div style="display:flex;flex-direction:column;gap:.6rem"><button class="btn primary" data-act="demo" data-v="id">${ico('user')}مستخدم من إندونيسيا</button><button class="btn ghost" data-act="restart">من البداية (اختيار الدولة)</button></div></div>`);
-}
 const DEMOS={
- eg:{country:'مصر',guide:'eg',group:'family',interests:['food','hist'],budget:'mid',time:'3h',first:'yes'},
- id:{country:'إندونيسيا',guide:'id',group:'solo',interests:['hist','homefood','coffee'],budget:'eco',time:'3h',first:'yes'},
- tr:{country:'تركيا',guide:'tr',group:'elder',interests:['hist','homefood','coffee'],budget:'mid',time:'half',first:'no'}
+ eg:{country:'مصر',guide:'eg',group:'family',dest:'quba',interests:['food','hist'],budget:'mid',time:'3h',first:'yes'},
+ id:{country:'إندونيسيا',guide:'id',group:'solo',dest:'quba',interests:['hist','coffee'],budget:'eco',time:'3h',first:'yes'},
+ tr:{country:'تركيا',guide:'tr',group:'elder',dest:'quba',interests:['hist','coffee'],budget:'mid',time:'half',first:'no'}
 };
-function sayPlace(v,force){ const p=byId(v),L=LOC[S.guide],e=eta(p.dist); const soc=''; say(L.pl(AR(e.min),e.mode==='walk',p.fam)+soc,G().speak,null,force); }
+function sayPlace(v,force){ const p=byId(v),L=LOC[S.guide]; if(p.dist==null){ say(T(p.d),G().speak,null,force); return; } const e=eta(p.dist); const soc=''; say(L.pl(AR(e.min),e.mode==='walk',p.fam)+soc,G().speak,null,force); }
 function runDemo(k){ const d=DEMOS[k]; Object.assign(S,{country:d.country,guide:d.guide,group:d.group,interests:[...d.interests],budget:d.budget,time:d.time,first:d.first,plan:null,chat:[],phase:'in',tab:'home',saved:new Set(),savedPlans:0}); go('main'); setTimeout(homeGreetSay,300); }
 

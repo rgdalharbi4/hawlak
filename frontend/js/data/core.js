@@ -48,13 +48,13 @@ const ICON = {
 const ico=(n,cls='')=>`<svg class="ico ${cls}${n==='back'||n==='fwd'?' dirflip':''}" viewBox="0 0 24 24" aria-hidden="true">${ICON[n]||''}</svg>`;
 
 const CAT = {
-  sight:{n:'معالم',col:'--c-sight',ic:'dome'}, food:{n:'مطاعم',col:'--c-food',ic:'food'},
+  sight:{n:'أماكن أثرية',col:'--c-sight',ic:'dome'}, food:{n:'مطاعم',col:'--c-food',ic:'food'},
   cafe:{n:'قهوة',col:'--c-cafe',ic:'coffee'}, shop:{n:'تسوق',col:'--c-shop',ic:'bag'},
   exp:{n:'تجارب',col:'--c-exp',ic:'star'}, svc:{n:'خدمات',col:'--c-svc',ic:'plus'}
 };
 const SUB = {pharm:['صيدلية','plus'],health:['مركز صحي','plus'],atm:['صراف','atm'],wc:['دورات مياه','wc'],park:['مواقف','park'],transit:['نقل','bus'],kids:['الأطفال','baby'],access:['إمكانية الوصول','access'],meet:['نقطة تجمع','pin'],gate:['بوابات','dome']};
 const INTERESTS = [
-  ['hist','أماكن أثرية'],['local','تجارب'],['food','مطاعم'],['coffee','قهوة'],['homefood','أطعمة من بلدي']
+  ['hist','أماكن أثرية'],['local','تجارب'],['food','مطاعم'],['coffee','قهوة']
 ];
 const IMAP = Object.fromEntries(INTERESTS);
 

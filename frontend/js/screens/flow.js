@@ -2,6 +2,7 @@
 const TABS=['home','explore','ask','plan','profile'];
 function screen(){
   switch(S.step){
+   case 'cover':return cover();
    case 'splash':return splash();
    case 'onb':return onb();
    case 'country':return country();
@@ -11,7 +12,7 @@ function screen(){
    default: return main();
   }
 }
-const LAT={s1:'Quba Mosque',s2:'Bir Aris (Aris Well)',e1:'Maqsad Quba',e2:'Waha Milaf',e3:'Al-Mirbad Farm',f1:'Turkiya Restaurant',f2:'Istanbul Shish Kebab',f3:'Al-Tabaq Al-Jawi (Javanese Dish)',f4:'Al-Bab Al-Ali Restaurant',f5:'Al-Shallal Al-Dimashqi',f6:'Mathaqak Al-Shahi',f7:'Hanaa Al-Raqi Restaurant',f8:'Mutabbaq Hay Al-Bahr',f9:'Kudu',f10:'Taybah Levantine Restaurant',c1:'Aris Cafe',c2:'Mocha Coffee',c3:'Ghala Al-Qahwa',c4:'Al-Aswad Cafe',c5:'Al-Mathaq Al-Maghribi Cafe'};
+const LAT=Object.fromEntries(QP.map(q=>[q[0],q[6].latin]));
 function setNames(){ P.forEach(p=>{ p.n=IS_AR()?p.nAr:(DICT[p.nAr]?T(p.nAr):(LAT[p.id]||p.nAr)); }); }
 function render(keepScroll){
   const sc=$('.screen'); const top=sc?sc.scrollTop:0;
@@ -39,24 +40,28 @@ function splash(){
    <div class="motto">المدينة بطريقتك</div>
    <p class="sub">مرشد من ثقافتك يرافقك في رحلتك.</p>
    ${S.guide?avatar(S.guide,92):''}
-   <button class="btn" data-act="start">ابدأ رحلتك</button>
-   <button class="demo" data-ar data-act="demoSheet">وضع العرض للجنة</button></div>`;
+   <button class="btn" data-act="start">ابدأ رحلتك</button></div>`;
 }
-function logoSvg(){return `<svg viewBox="0 0 64 64" width="58" height="58" aria-hidden="true"><path d="M12 52V34c0-12 9-20 20-20s20 8 20 20v18" fill="none" stroke="#0E5A63" stroke-width="4" stroke-linecap="round"/><path d="M32 8v6" stroke="#B94A24" stroke-width="4" stroke-linecap="round"/><path d="M24 52V38a8 8 0 0116 0v14" fill="#B94A24"/></svg>`}
+function logoSvg(){return `<img src="assets/brand/logo.png" alt="حولك">`}
 
 function onb(){
   const S3=[
-   {t:'اكتشف ما يناسبك',d:'أماكن أثرية وتجارب وأكل وقهوة تُقترح حسب اهتماماتك.',art:`<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem;width:100%;max-width:300px">${['dome','star','food','coffee','pin','heart'].map((i,k)=>`<div style="aspect-ratio:1;border-radius:20px;background:var(--surface);border:1px solid var(--line);display:grid;place-items:center;color:var(--green);box-shadow:var(--shadow)">${ico(i,'')}</div>`).join('')}</div>`},
-   {t:'مرشد يفهمك',d:'يتحدث بلغتك ولهجتك، ويساعدك في كل خطوة من رحلتك.',art:`<div class="faces" style="margin:0">${avatar('id',96)}</div>`}
+   {t:'اكتشف ما يناسبك',d:'أماكن أثرية وتجارب وأكل وقهوة تُقترح حسب اهتماماتك.'},
+   {t:'مرشد يفهمك',d:'يتحدث بلغتك ولهجتك، ويساعدك في كل خطوة من رحلتك.'}
   ][S.onb];
   return `<div class="screen onb"><div class="topbar between" style="justify-content:space-between"><button class="iconbtn" data-act="prevOnb" aria-label="رجوع">${ico('back')}</button><button class="btn ghost sm" data-act="skipOnb">تخطي</button></div>
-   <div class="oart">${S3.art}</div>
-   <div class="txt"><div class="dots">${[0,1].map(i=>`<i class="${i===S.onb?'on':''}"></i>`).join('')}</div><h2>${S3.t}</h2><p class="muted">${S3.d}</p>
-   <button class="btn primary block" style="margin-top:.8rem" data-act="nextOnb">${S.onb<1?'التالي':'ابدأ الآن'}</button></div></div>`;
+   <div class="otext"><h2>${S3.t}</h2><p>${S3.d}</p></div>
+   <div class="txt"><div class="dots">${[0,1].map(i=>`<i class="${i===S.onb?'on':''}"></i>`).join('')}</div>
+   <button class="btn primary block" data-act="nextOnb">${S.onb<1?'التالي':'ابدأ الآن'}</button></div></div>`;
+}
+/* الغلاف: أول صفحة. صورة الهوية وزر ابدأ */
+function cover(){
+  return `<div class="screen cover" data-ar><img src="assets/brand/cover.jpg" alt="حولك">
+   <button class="btn start" data-act="enter"><span class="start-ar">ابدأ</span><span class="start-sub"><i>Start</i><b></b><i>Mulai</i><b></b><i>Başla</i></span></button></div>`;
 }
 function country(){
   const q=S.q.trim().toLowerCase(); const list=COUNTRIES.filter(c=>!q||c[0].includes(q)||NATIVE[c[0]].toLowerCase().includes(q));
-  return `<div class="screen" data-ar><div class="pad" style="padding-top:1.6rem">
+  return `<div class="screen" data-ar><div class="pad" style="padding-top:1.6rem"><button class="iconbtn" data-act="go" data-v="cover" aria-label="رجوع" style="position:absolute;top:.9rem;inset-inline-start:.9rem">${ico('back')}</button>
    <div style="text-align:center;margin-bottom:1rem"><div class="logo" style="margin:0 auto .6rem;width:76px;height:76px;border-radius:22px">${logoSvg()}</div><h1 style="font-size:2.3rem;color:var(--green)">${BRAND} · Hawlak</h1></div>
    <h2 style="font-size:1.6rem;text-align:center">من وين جايينا؟</h2>
    <p style="text-align:center;margin:.2rem 0 1rem;font-size:1.15rem" dir="auto">Where are you from? · Nerelisin? · Dari mana asalmu?</p>
@@ -76,6 +81,7 @@ function guideReveal(){
 const QS=[
  {k:'first',q:'أول مرة تزور المدينة؟',o:[['yes','نعم'],['no','لا']]},
  {k:'group',q:'مين معك في الرحلة؟',o:[['solo','لوحدي'],['family','العائلة'],['kids','أطفال'],['elder','كبار سن'],['friends','أصدقاء']]},
+ {k:'dest',q:'وين وجهتك حاليًا؟',o:[['quba','قباء']]},
  {k:'interests',q:'وش تحب أكثر؟ تقدر تختار أكثر من خيار.',multi:true,o:INTERESTS},
  {k:'budget',q:'كم ميزانيتك اليوم؟',o:[['eco','اقتصادية'],['open','مفتوحة']]}
 ];
