@@ -58,21 +58,21 @@ def main():
         labels = pg.evaluate("['hist','local'].map(k=>LOC[S.guide].o.interests[k])")
         assert titles == labels, (titles, labels)
 
-        # التخصيص: فقط الأقسام المختارة (أثري + تجارب). اقتصادية: مسجد قباء وبئر الخاتم وبستان المستظل (٣)، ومفتوحة: ٤ (مع ورد المدينة)
+        # استكشف: كل الأماكن بكل الأنواع حتى لو لم يخترها الزائر وحتى بالميزانية الاقتصادية
         pg.evaluate("S.exView='list';tab('explore')")
         pg.wait_for_timeout(400)
-        assert pg.locator(".cultcard").count() == 3
+        want = lambda: pg.evaluate("P.filter(p=>visAny(p)&&['sight','exp','food','cafe'].includes(p.cat)).length")
+        assert pg.locator(".cultcard").count() == want() > 3, "استكشف يجب أن يتجاوز الأقسام المختارة"
+        assert pg.locator(".cultcard").count() == 10, "استكشف يعرض الأماكن العشرة كلها"
+        assert pg.locator(".chips .chip").count() == 5, "الكل + ٤ أنواع"
         pg.evaluate("S.budget='open';render()")
-        assert pg.locator(".cultcard").count() == 4
-        pg.evaluate("S.budget='eco'")
-        pg.evaluate("S.interests=['local'];render()")
-        assert pg.locator(".cultcard").count() == 1, "تجارب فقط واقتصادية: تجربة واحدة"
-        pg.evaluate("S.interests=['hist','local']")
+        assert pg.locator(".cultcard").count() == 10
+        pg.evaluate("S.budget='eco';render()")
 
-        # الخريطة: تظهر الأماكن التي لها موقع فقط
+        # الخريطة: تظهر الأماكن التي لها موقع فقط (كل الأنواع)
         pg.evaluate("S.exView='map';tab('explore')")
         pg.wait_for_timeout(500)
-        assert pg.locator("#mpins .pin").count() == 3
+        assert pg.locator("#mpins .pin").count() == pg.evaluate("filtered().filter(hasLoc).length") > 3
 
         # تبديل لغة الواجهة إلى العربية ثم الرجوع
         pg.click("#langfab")

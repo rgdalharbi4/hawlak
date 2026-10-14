@@ -3,9 +3,10 @@
 const IGROUPS=[['sight','hist'],['exp','local'],['food','food'],['cafe','coffee']];   // [نوع المكان، الاهتمام]
 const interestLabel=k=>T(IMAP[k]);
 function groupsWanted(){ const a=S.interests||[]; return IGROUPS.filter(g=>!a.length||a.includes(g[1])).map(g=>[g[0],interestLabel(g[1]),[g[0]],g[1]]); }
-function filterList(){ const g=groupsWanted(); return g.length<=1?[]:[['all',T('الكل')],...g.map(x=>[x[0],x[1]])]; }
+/* استكشف يعرض كل الأنواع حتى التي لم يخترها الزائر */
+function filterList(){ return [['all',T('الكل')],...IGROUPS.map(g=>[g[0],interestLabel(g[1])])]; }
 const KEEP=['sight','exp','food','cafe'];
-function filtered(){ return P.filter(p=>vis(p)&&KEEP.includes(p.cat)&&(S.filter==='all'||p.cat===S.filter)); }
+function filtered(){ return P.filter(p=>visAny(p)&&KEEP.includes(p.cat)&&(S.filter==='all'||p.cat===S.filter)); }
 function explore(){
   const v=S.exView;
   return `<div style="display:flex;flex-direction:column;flex:1;min-height:0">
@@ -69,7 +70,7 @@ function listView(){
   const svcs=Object.entries(SUB);
   return `<div class="screen" style="animation:none"><div class="pad" style="padding-top:.2rem">
    <div class="chips" style="margin-bottom:.8rem">${filterList().map(f=>`<button class="chip ${S.filter===f[0]?'on':''}" data-act="filter" data-v="${f[0]}">${f[1]}</button>`).join('')}</div>
-   <div class="sec-title"><h3>${S.filter==='all'?(groupsWanted().length===1?groupsWanted()[0][1]:T('كل الأماكن')):interestLabel(IGROUPS.find(g=>g[0]===S.filter)[1])}</h3><span>${T('{0} نتيجة',AR(filtered().length))}</span></div>
+   <div class="sec-title"><h3>${S.filter==='all'?T('كل الأماكن'):interestLabel(IGROUPS.find(g=>g[0]===S.filter)[1])}</h3><span>${T('{0} نتيجة',AR(filtered().length))}</span></div>
    <div style="display:flex;flex-direction:column;gap:.7rem">${filtered().sort((a,b)=>D(a)-D(b)).map(p=>`<button class="card cultcard" data-act="openPlace" data-v="${p.id}">${artBlock(p)}<span class="grow"><b>${p.n}</b>${stat(p)}</span></button>`).join('')}</div></div></div>`;
 }
 

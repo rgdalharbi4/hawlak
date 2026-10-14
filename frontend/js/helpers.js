@@ -8,7 +8,8 @@ function artBlock(p,cls=''){
 /* وش تحب؟ تحدد الأقسام الظاهرة: أثري ← أماكن أزورها، تجارب ← تجارب، مطاعم ← أكل، قهوة ← مقاهٍ */
 const INTEREST_CATS={hist:['sight'],local:['exp'],food:['food'],coffee:['cafe']};
 function wantCats(){ const a=S.interests||[]; if(!a.length) return null; return a.flatMap(k=>INTEREST_CATS[k]||[]); }
-function vis(p){ const w=wantCats(); return !(S.a11y.wheel && !p.acc) && !(S.budget==='eco' && !p.eco) && !(w && !w.includes(p.cat)); }
+function visAny(p){ return !(S.a11y.wheel && !p.acc); }   // بلا تصفية الاهتمامات ولا الميزانية (تبويب استكشف يعرض كل شيء)
+function vis(p){ const w=wantCats(); return visAny(p) && !(S.budget==='eco' && !p.eco) && !(w && !w.includes(p.cat)); }
 function score(p,prev){
   let s=0;const a=S.interests;
   if(p.cat!=='svc'){
